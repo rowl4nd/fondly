@@ -419,45 +419,49 @@ a{ color: var(--berry); }
 }
 #describeInput:focus-visible, #printTextInput:focus-visible{ outline: 2px solid var(--mustard); outline-offset: 1px; }
 
-.choice-row{ display: flex; gap: 0.6rem; flex-wrap: wrap; }
-.choice-btn{
-  background: var(--paper-deep);
-  border: 1.5px solid transparent;
-  border-radius: 4px;
-  padding: 0.6em 1em;
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 0.92rem;
-  color: var(--ink-soft);
-  cursor: pointer;
-}
-.choice-btn.active{ border-color: var(--berry); color: var(--ink); background: var(--paper); }
-.choice-btn:focus-visible{ outline: 2px solid var(--mustard); outline-offset: 2px; }
-
-.swatch-btn{
+.choice-row{ display: flex; gap: 0.7rem; flex-wrap: wrap; }
+.choice-btn, .swatch-btn{
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
+  width: 86px;
+  background: var(--paper-deep);
+  border: 1.5px solid transparent;
+  border-radius: 6px;
+  padding: 0.55rem 0.4rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  cursor: pointer;
+  text-align: center;
+}
+.choice-btn.active, .swatch-btn.active{ border-color: var(--berry); color: var(--ink); background: var(--paper); }
+.choice-btn:focus-visible, .swatch-btn:focus-visible{ outline: 2px solid var(--mustard); outline-offset: 2px; }
+.thumb-canvas{
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 4px;
+  display: block;
+  background: var(--paper);
+}
+
+.pos-btn{
   background: var(--paper-deep);
   border: 1.5px solid transparent;
   border-radius: 4px;
-  padding: 0.5em 0.9em 0.5em 0.5em;
+  padding: 0.6em 1.1em;
   font-family: var(--font-body);
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   color: var(--ink-soft);
   cursor: pointer;
 }
-.swatch-btn::before{
-  content: "";
-  width: 1.4rem;
-  height: 1.4rem;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--sw-dark) 50%, var(--sw-light) 50%);
-  flex-shrink: 0;
-}
-.swatch-btn.active{ border-color: var(--berry); color: var(--ink); background: var(--paper); }
-.swatch-btn:focus-visible{ outline: 2px solid var(--mustard); outline-offset: 2px; }
+.pos-btn.active{ border-color: var(--berry); color: var(--ink); background: var(--paper); }
+.pos-btn:focus-visible{ outline: 2px solid var(--mustard); outline-offset: 2px; }
+
+.step-intro-tight{ margin-top: 1.1rem; margin-bottom: 0.7rem; }
 
 .step-nav{
   display: flex;
@@ -465,6 +469,35 @@ a{ color: var(--berry); }
   gap: 0.8rem;
   padding-top: 0.3rem;
 }
+
+/* Result stage */
+.result-stage{ padding-top: 0.2rem; }
+.prompt-box{
+  background: var(--paper-deep);
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  padding: 1rem 1.1rem;
+  margin-bottom: 1.2rem;
+}
+.prompt-label{ font-size: 0.78rem; font-weight: 700; color: var(--ink-soft); margin-bottom: 0.35rem; }
+.prompt-text{ font-family: var(--font-display); font-style: italic; font-size: 0.98rem; color: var(--ink); margin: 0; }
+
+.adjust-row{ display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 1.3rem; }
+.adjust-row textarea{
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  padding: 0.7em;
+  resize: vertical;
+}
+.adjust-row textarea:focus-visible{ outline: 2px solid var(--mustard); outline-offset: 1px; }
+.adjust-row .btn{ align-self: flex-start; }
+
+.result-cta-row{ display: flex; gap: 0.8rem; flex-wrap: wrap; }
 
 .credits-block{ margin-top: 1.4rem; padding-top: 1.2rem; border-top: 1px dashed var(--hairline); }
 .credits-hint{ font-size: 0.85rem; margin-bottom: 0.9rem; }
