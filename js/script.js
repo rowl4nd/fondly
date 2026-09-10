@@ -18,8 +18,11 @@
   }
 
   /* ---------- Elements ---------- */
+  var stepper = document.getElementById("stepper");
   var stepDots = document.querySelectorAll(".step-dot");
+  var stepPanelsWrap = document.querySelector(".step-panels");
   var stepPanels = document.querySelectorAll("[data-step-panel]");
+  var stepNavRow = document.getElementById("stepNavRow");
   var stepBack = document.getElementById("stepBack");
   var stepNext = document.getElementById("stepNext");
 
@@ -37,10 +40,21 @@
 
   var styleChoices = document.getElementById("styleChoices");
   var colourChoices = document.getElementById("colourChoices");
+  var positionChoices = document.getElementById("positionChoices");
+
+  var resultStage = document.getElementById("resultStage");
+  var promptText = document.getElementById("promptText");
+  var finalAdjustInput = document.getElementById("finalAdjustInput");
+  var finalAdjustBtn = document.getElementById("finalAdjustBtn");
+  var startAgainBtn = document.getElementById("startAgainBtn");
 
   var creditsLine = document.getElementById("creditsLine");
   var creditsFootnote = document.getElementById("creditsFootnote");
   var punchCard = document.getElementById("punchCard");
+
+  /* ---------- Labels ---------- */
+  var STYLE_LABELS = { ink: "Ink Wash", watercolour: "Watercolour", line: "Line Art", oil: "Oil Paint" };
+  var COLOUR_LABELS = { mono: "Mono Ink", berry: "Warm Berry", gold: "Golden Hour", plum: "Plum Dusk" };
 
   /* ---------- Wizard state ---------- */
   var currentStep = 1;
@@ -50,6 +64,7 @@
   var currentImage = null;
   var selectedStyle = "ink";
   var selectedColour = "mono";
+  var selectedPosition = "bottom";
   var hasGenerated = false;
 
   function goToStep(n) {
@@ -63,7 +78,7 @@
     stepBack.disabled = currentStep === 1;
     stepNext.textContent =
       currentStep === TOTAL_STEPS
-        ? (hasGenerated ? "Update my preview" : "Generate my preview")
+        ? (hasGenerated ? "Update image" : "Generate image")
         : NEXT_LABELS[currentStep];
   }
 
@@ -85,29 +100,38 @@
     if (currentStep < TOTAL_STEPS) {
       goToStep(currentStep + 1);
     } else {
-      consumeCredit(generatePreview);
+      consumeCredit(function () {
+        generatePreview();
+        showResultStage();
+      });
     }
   });
 
-  /* ---------- Style & colour choices ---------- */
+  /* ---------- Style, colour & position choices ---------- */
   styleChoices.addEventListener("click", function (e) {
     var btn = e.target.closest(".choice-btn");
     if (!btn) return;
-    styleChoices.querySelectorAll(".choice-btn").forEach(function (b) {
-      b.classList.remove("active");
-    });
+    styleChoices.querySelectorAll(".choice-btn").forEach(function (b) { b.classList.remove("active"); });
     btn.classList.add("active");
     selectedStyle = btn.getAttribute("data-style");
+    renderColourThumbnails();
   });
 
   colourChoices.addEventListener("click", function (e) {
     var btn = e.target.closest(".swatch-btn");
     if (!btn) return;
-    colourChoices.querySelectorAll(".swatch-btn").forEach(function (b) {
-      b.classList.remove("active");
-    });
+    colourChoices.querySelectorAll(".swatch-btn").forEach(function (b) { b.classList.remove("active"); });
     btn.classList.add("active");
     selectedColour = btn.getAttribute("data-colour");
+    renderStyleThumbnails();
+  });
+
+  positionChoices.addEventListener("click", function (e) {
+    var btn = e.target.closest(".pos-btn");
+    if (!btn) return;
+    positionChoices.querySelectorAll(".pos-btn").forEach(function (b) { b.classList.remove("active"); });
+    btn.classList.add("active");
+    selectedPosition = btn.getAttribute("data-position");
   });
 
   /* ---------- Colour pairs & style curves ---------- */
@@ -119,16 +143,9 @@
   };
 
   function styleCurve(lum, styleKey) {
-    if (styleKey === "watercolour") {
-      return 0.5 + (lum - 0.5) * 0.75;
-    }
-    if (styleKey === "line") {
-      var v = 0.5 + (lum - 0.5) * 1.9;
-      return Math.min(1, Math.max(0, v));
-    }
-    if (styleKey === "oil") {
-      return Math.pow(lum, 0.85);
-    }
+    if (styleKey === "watercolour") return 0.5 + (lum - 0.5) * 0.75;
+    if (styleKey === "line") return Math.min(1, Math.max(0, 0.5 + (lum - 0.5) * 1.9));
+    if (styleKey === "oil") return Math.pow(lum, 0.85);
     return lum; // ink wash — untouched
   }
 
@@ -137,6 +154,79 @@
     if (styleKey === "line") return "contrast(1.1)";
     if (styleKey === "oil") return "contrast(1.05) saturate(1.05)";
     return "none";
+  }
+
+  function duotoneImageData(imgData, styleKey, colourKey) {
+    var pair = COLOUR_PAIRS[colourKey] || COLOUR_PAIRS.mono;
+    var d = imgData.data;
+    for (var i = 0; i < d.length; i += 4) {
+      var lum = (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]) / 255;
+      lum = styleCurve(lum, styleKey);
+      d[i] = pair.dark[0] + (pair.light[0] - pair.dark[0]) * lum;
+      d[i + 1] = pair.dark[1] + (pair.light[1] - pair.dark[1]) * lum;
+      d[i + 2] = pair.dark[2] + (pair.light[2] - pair.dark[2]) * lum;
+    }
+    return imgData;
+  }
+
+  /* ---------- Small example thumbnails per option ---------- */
+  function drawSourceToThumb(tctx, size) {
+    if (currentImage) {
+      var iw = currentImage.naturalWidth || currentImage.width;
+      var ih = currentImage.naturalHeight || currentImage.height;
+      var scale = Math.max(size / iw, size / ih);
+      var dw = iw * scale, dh = ih * scale;
+      tctx.drawImage(currentImage, (size - dw) / 2, (size - dh) / 2, dw, dh);
+    } else {
+      // generic placeholder scene so styles/colours are still visibly different pre-upload
+      tctx.fillStyle = "#9a9a9a";
+      tctx.fillRect(0, 0, size, size);
+      tctx.fillStyle = "#c9c9c9";
+      tctx.beginPath();
+      tctx.arc(size * 0.32, size * 0.3, size * 0.14, 0, Math.PI * 2);
+      tctx.fill();
+      tctx.fillStyle = "#6c6c6c";
+      tctx.beginPath();
+      tctx.moveTo(0, size);
+      tctx.lineTo(size * 0.35, size * 0.55);
+      tctx.lineTo(size * 0.6, size * 0.8);
+      tctx.lineTo(size, size * 0.48);
+      tctx.lineTo(size, size);
+      tctx.closePath();
+      tctx.fill();
+    }
+  }
+
+  var THUMB_SIZE = 64;
+
+  function renderThumb(canvasEl, styleKey, colourKey) {
+    var size = THUMB_SIZE;
+    canvasEl.width = size;
+    canvasEl.height = size;
+    var tctx = canvasEl.getContext("2d");
+    tctx.clearRect(0, 0, size, size);
+    tctx.filter = canvasFilterFor(styleKey);
+    drawSourceToThumb(tctx, size);
+    tctx.filter = "none";
+    var data;
+    try {
+      data = tctx.getImageData(0, 0, size, size);
+    } catch (e) {
+      return;
+    }
+    tctx.putImageData(duotoneImageData(data, styleKey, colourKey), 0, 0);
+  }
+
+  function renderStyleThumbnails() {
+    styleChoices.querySelectorAll(".choice-btn").forEach(function (btn) {
+      renderThumb(btn.querySelector(".thumb-canvas"), btn.getAttribute("data-style"), selectedColour);
+    });
+  }
+
+  function renderColourThumbnails() {
+    colourChoices.querySelectorAll(".swatch-btn").forEach(function (btn) {
+      renderThumb(btn.querySelector(".thumb-canvas"), selectedStyle, btn.getAttribute("data-colour"));
+    });
   }
 
   /* ---------- Credits state machine ----------
@@ -157,8 +247,7 @@
 
   function renderCreditsCopy() {
     if (state.phase === "free") {
-      creditsLine.textContent =
-        state.used < 1 ? "1 free preview available" : "Free preview used";
+      creditsLine.textContent = state.used < 1 ? "1 free preview available" : "Free preview used";
       creditsFootnote.textContent =
         "After your free preview, sign up for 4 more changes — or top up 10 further credits for £5, taken off your order if you print.";
     } else if (state.phase === "signedup") {
@@ -199,16 +288,17 @@
   renderCreditsCopy();
 
   /* ---------- Canvas rendering ---------- */
-  function drawTextPlaque(w, h, text) {
-    if (!text) return;
+  function drawTextPlaque(w, h, text, position) {
+    if (!text || position === "none") return;
     var plaqueH = Math.max(38, Math.round(h * 0.11));
+    var y = position === "top" ? 0 : position === "middle" ? (h - plaqueH) / 2 : h - plaqueH;
     ctx.fillStyle = "rgba(243,233,216,0.9)";
-    ctx.fillRect(0, h - plaqueH, w, plaqueH);
+    ctx.fillRect(0, y, w, plaqueH);
     ctx.fillStyle = "#2B1B14";
     ctx.font = "italic 600 " + Math.round(plaqueH * 0.42) + 'px "Fraunces", serif';
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(text, w / 2, h - plaqueH / 2, w - 24);
+    ctx.fillText(text, w / 2, y + plaqueH / 2, w - 24);
   }
 
   function drawGrain(w, h) {
@@ -222,7 +312,7 @@
     ctx.restore();
   }
 
-  function applyStyledDuotone(img, styleKey, colourKey, printText) {
+  function applyStyledDuotone(img, styleKey, colourKey, printText, position) {
     var maxW = 480, maxH = 340;
     var w = img.naturalWidth || img.width;
     var h = img.naturalHeight || img.height;
@@ -238,25 +328,12 @@
     try {
       frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
     } catch (e) {
-      // Canvas may be tainted on some file:// setups — leave the plain
-      // image in place rather than throwing.
       return;
     }
-    var pair = COLOUR_PAIRS[colourKey] || COLOUR_PAIRS.mono;
-    var d = frame.data;
-    for (var i = 0; i < d.length; i += 4) {
-      var lum = (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]) / 255;
-      lum = styleCurve(lum, styleKey);
-      d[i] = pair.dark[0] + (pair.light[0] - pair.dark[0]) * lum;
-      d[i + 1] = pair.dark[1] + (pair.light[1] - pair.dark[1]) * lum;
-      d[i + 2] = pair.dark[2] + (pair.light[2] - pair.dark[2]) * lum;
-    }
-    ctx.putImageData(frame, 0, 0);
+    ctx.putImageData(duotoneImageData(frame, styleKey, colourKey), 0, 0);
 
-    if (styleKey === "oil") {
-      drawGrain(canvas.width, canvas.height);
-    }
-    drawTextPlaque(canvas.width, canvas.height, printText);
+    if (styleKey === "oil") drawGrain(canvas.width, canvas.height);
+    drawTextPlaque(canvas.width, canvas.height, printText, position);
   }
 
   function renderPosterPreview() {
@@ -267,7 +344,7 @@
       pair.light.join(",") + ",0.32)), var(--paper-deep)";
     posterText.textContent = "\u201C" + desc + "\u201D";
     var printText = printTextInput.value.trim();
-    if (printText) {
+    if (printText && selectedPosition !== "none") {
       posterCaption.textContent = printText;
       posterCaption.hidden = false;
     } else {
@@ -278,7 +355,7 @@
   function generatePreview() {
     var printText = printTextInput.value.trim();
     if (currentImage) {
-      applyStyledDuotone(currentImage, selectedStyle, selectedColour, printText);
+      applyStyledDuotone(currentImage, selectedStyle, selectedColour, printText, selectedPosition);
       canvas.hidden = false;
       posterPreview.hidden = true;
       placeholder.hidden = true;
@@ -293,10 +370,84 @@
       placeholder.hidden = false;
     }
     hasGenerated = true;
-    stepNext.textContent =
-      currentStep === TOTAL_STEPS ? "Update my preview" : NEXT_LABELS[currentStep];
   }
 
+  /* ---------- Prompt built from the four steps ---------- */
+  function buildPrompt() {
+    var desc = describeInput.value.trim();
+    var subjectPart = currentImage ? "Your uploaded photo" + (desc ? ", " + desc : "") : (desc || "Your idea");
+    var stylePart = "an " + STYLE_LABELS[selectedStyle] + " style";
+    var colourPart = "a " + COLOUR_LABELS[selectedColour] + " colour palette";
+    var printText = printTextInput.value.trim();
+    var textPart =
+      printText && selectedPosition !== "none"
+        ? ', with the text "' + printText + '" placed at the ' + selectedPosition + " of the print"
+        : "";
+    return subjectPart + " — rendered in " + stylePart + ", " + colourPart + textPart + ".";
+  }
+
+  /* ---------- Result stage ---------- */
+  function showResultStage() {
+    stepper.hidden = true;
+    stepPanelsWrap.hidden = true;
+    stepNavRow.hidden = true;
+    resultStage.hidden = false;
+    promptText.textContent = buildPrompt();
+    finalAdjustInput.value = "";
+  }
+
+  function hideResultStage() {
+    stepper.hidden = false;
+    stepPanelsWrap.hidden = false;
+    stepNavRow.hidden = false;
+    resultStage.hidden = true;
+  }
+
+  finalAdjustBtn.addEventListener("click", function () {
+    var tweak = finalAdjustInput.value.trim();
+    if (!tweak) return;
+    describeInput.value = describeInput.value.trim() ? describeInput.value.trim() + ". " + tweak : tweak;
+    consumeCredit(function () {
+      generatePreview();
+      promptText.textContent = buildPrompt();
+      finalAdjustInput.value = "";
+    });
+  });
+
+  startAgainBtn.addEventListener("click", function () {
+    currentImage = null;
+    photoInput.value = "";
+    fileChosen.textContent = "";
+    describeInput.value = "";
+    printTextInput.value = "";
+    finalAdjustInput.value = "";
+
+    selectedStyle = "ink";
+    selectedColour = "mono";
+    selectedPosition = "bottom";
+    hasGenerated = false;
+
+    styleChoices.querySelectorAll(".choice-btn").forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-style") === "ink");
+    });
+    colourChoices.querySelectorAll(".swatch-btn").forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-colour") === "mono");
+    });
+    positionChoices.querySelectorAll(".pos-btn").forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-position") === "bottom");
+    });
+
+    canvas.hidden = true;
+    posterPreview.hidden = true;
+    placeholder.hidden = false;
+
+    renderStyleThumbnails();
+    renderColourThumbnails();
+    hideResultStage();
+    goToStep(1);
+  });
+
+  /* ---------- Photo upload ---------- */
   photoInput.addEventListener("change", function (e) {
     var file = e.target.files && e.target.files[0];
     if (!file) return;
@@ -306,11 +457,16 @@
       var img = new Image();
       img.onload = function () {
         currentImage = img;
+        renderStyleThumbnails();
+        renderColourThumbnails();
       };
       img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
   });
 
+  /* ---------- Init ---------- */
+  renderStyleThumbnails();
+  renderColourThumbnails();
   goToStep(1);
 })();
