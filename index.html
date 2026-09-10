@@ -129,38 +129,85 @@
           </div>
 
           <div class="step-panel" data-step-panel="2" hidden>
-            <p class="step-intro">Pick the treatment.</p>
+            <p class="step-intro">Pick the treatment. Examples update to match your photo once you've added one.</p>
             <div class="choice-row" id="styleChoices">
-              <button class="choice-btn active" data-style="ink" type="button">Ink Wash</button>
-              <button class="choice-btn" data-style="watercolour" type="button">Watercolour</button>
-              <button class="choice-btn" data-style="line" type="button">Line Art</button>
-              <button class="choice-btn" data-style="oil" type="button">Oil Paint</button>
+              <button class="choice-btn active" data-style="ink" type="button">
+                <canvas class="thumb-canvas"></canvas>
+                <span>Ink Wash</span>
+              </button>
+              <button class="choice-btn" data-style="watercolour" type="button">
+                <canvas class="thumb-canvas"></canvas>
+                <span>Watercolour</span>
+              </button>
+              <button class="choice-btn" data-style="line" type="button">
+                <canvas class="thumb-canvas"></canvas>
+                <span>Line Art</span>
+              </button>
+              <button class="choice-btn" data-style="oil" type="button">
+                <canvas class="thumb-canvas"></canvas>
+                <span>Oil Paint</span>
+              </button>
             </div>
           </div>
 
           <div class="step-panel" data-step-panel="3" hidden>
             <p class="step-intro">Pick your colours.</p>
             <div class="choice-row" id="colourChoices">
-              <button class="swatch-btn active" data-colour="mono" type="button" style="--sw-dark:#2B1B14;--sw-light:#F3E9D8;">Mono Ink</button>
-              <button class="swatch-btn" data-colour="berry" type="button" style="--sw-dark:#5E212B;--sw-light:#F3E9D8;">Warm Berry</button>
-              <button class="swatch-btn" data-colour="gold" type="button" style="--sw-dark:#2B1B14;--sw-light:#C98A2C;">Golden Hour</button>
-              <button class="swatch-btn" data-colour="plum" type="button" style="--sw-dark:#4A1942;--sw-light:#E9DCC3;">Plum Dusk</button>
+              <button class="swatch-btn active" data-colour="mono" type="button">
+                <canvas class="thumb-canvas"></canvas>
+                <span>Mono Ink</span>
+              </button>
+              <button class="swatch-btn" data-colour="berry" type="button">
+                <canvas class="thumb-canvas"></canvas>
+                <span>Warm Berry</span>
+              </button>
+              <button class="swatch-btn" data-colour="gold" type="button">
+                <canvas class="thumb-canvas"></canvas>
+                <span>Golden Hour</span>
+              </button>
+              <button class="swatch-btn" data-colour="plum" type="button">
+                <canvas class="thumb-canvas"></canvas>
+                <span>Plum Dusk</span>
+              </button>
             </div>
           </div>
 
           <div class="step-panel" data-step-panel="4" hidden>
             <label class="style-label" for="printTextInput">Add text to the print <span class="optional">(optional)</span></label>
             <textarea id="printTextInput" rows="1" placeholder="e.g. Biscuit, Est. 2021"></textarea>
+            <p class="step-intro step-intro-tight">Where should it sit?</p>
+            <div class="choice-row" id="positionChoices">
+              <button class="pos-btn" data-position="top" type="button">Top</button>
+              <button class="pos-btn" data-position="middle" type="button">Middle</button>
+              <button class="pos-btn active" data-position="bottom" type="button">Bottom</button>
+              <button class="pos-btn" data-position="none" type="button">None</button>
+            </div>
           </div>
         </div>
 
-        <div class="step-nav">
+        <div class="step-nav" id="stepNavRow">
           <button class="btn btn-ghost" id="stepBack" type="button" disabled>Back</button>
           <button class="btn btn-primary" id="stepNext" type="button">Next: style</button>
         </div>
 
+        <div class="result-stage" id="resultStage" hidden>
+          <div class="prompt-box">
+            <p class="prompt-label">Prompt sent to our design AI</p>
+            <p class="prompt-text" id="promptText"></p>
+          </div>
+          <div class="adjust-row">
+            <label class="style-label" for="finalAdjustInput">One last descriptive adjustment <span class="optional">(optional)</span></label>
+            <textarea id="finalAdjustInput" rows="2" placeholder="e.g. make the crown gold, not silver"></textarea>
+            <button class="btn btn-ghost" id="finalAdjustBtn" type="button">Update image</button>
+          </div>
+          <div class="result-cta-row">
+            <a href="#pricing" class="btn btn-primary">Choose your size &amp; pay</a>
+            <button class="btn btn-ghost" id="startAgainBtn" type="button">Start again</button>
+          </div>
+        </div>
+
         <div class="credits-block">
-          <p class="credits-hint">Steps 1–4 are free to configure and reconfigure — it's generating or updating the preview that counts as a change.</p>
+          <p class="credits-hint">Steps 1–4 are free to configure and reconfigure — it's generating or updating the image that counts as a change.</p>
           <p class="credits-line" id="creditsLine">1 free preview available</p>
           <div class="punch-card" id="punchCard" aria-hidden="true"></div>
           <p class="credits-footnote" id="creditsFootnote">After your free preview, sign up for 4 more changes — or top up 10 further credits for £5, taken off your order if you print.</p>
