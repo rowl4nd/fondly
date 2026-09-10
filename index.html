@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fondly — Your photos, made into prints you'll actually hang</title>
+<meta name="description" content="Upload a photo or describe an idea. Fondly turns it into a print you'd pick out in a gallery, printed and posted across the UK.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a href="#top" class="logo">Fondly</a>
+    <nav class="main-nav" id="mainNav">
+      <a href="#how">How it works</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#try" class="nav-cta">Start a print</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <div class="hero-copy">
+        <h1>Photos you love,<br>turned into prints<br>you'll actually hang.</h1>
+        <p class="lede">Upload a photo, or just describe what you're picturing. We shape it into a piece you'd pick out in a gallery — free to preview, printed at true quality, and posted to your door.</p>
+        <div class="hero-actions">
+          <a href="#try" class="btn btn-primary">Start your print</a>
+          <a href="#how" class="btn btn-ghost">See how it works</a>
+        </div>
+        <p class="hero-note">Currently shipping across the UK only.</p>
+      </div>
+      <div class="hero-visual">
+        <div class="frame-stack" aria-hidden="true">
+          <div class="frame-photo frame-back" style="background-image:url('images/hero-before.jpg')">
+            <span class="frame-tag">before</span>
+          </div>
+          <div class="frame-photo frame-front" style="background-image:url('images/hero-after.jpg')">
+            <span class="frame-tag frame-tag-after">your print</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="how">
+    <div class="wrap">
+      <h2>From photo to print, in three steps</h2>
+      <ol class="strip">
+        <li>
+          <span class="stub">1</span>
+          <h3>Upload a photo, or tell us what you're picturing</h3>
+          <p>A favourite snap, a pet, a place you love — or just a few sentences describing the idea.</p>
+        </li>
+        <li>
+          <span class="stub">2</span>
+          <h3>We shape it into your style, free to preview</h3>
+          <p>See your design before you pay a penny. Not quite right? Nudge it again within your set of changes.</p>
+        </li>
+        <li>
+          <span class="stub">3</span>
+          <h3>Happy with it? We print it and post it out</h3>
+          <p>Printed at true gallery quality on heavyweight paper, and on its way to you within days.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- TRY IT / DEMO -->
+  <section class="try" id="try">
+    <div class="wrap try-inner">
+      <div class="try-copy">
+        <h2>Try the idea yourself</h2>
+        <p>This is a working preview of the design tool — upload a photo below and watch it shift into print-ready style, right in your browser.</p>
+        <div class="trust-list">
+          <p>Free to preview before you pay</p>
+          <p>Printed at home, on real print stock</p>
+          <p>Only pay when you're happy with the design</p>
+        </div>
+      </div>
+
+      <div class="demo-panel">
+        <div class="demo-tabs" role="tablist">
+          <button class="tab-btn active" id="tabUpload" data-tab="upload" role="tab" aria-selected="true">Upload a photo</button>
+          <button class="tab-btn" id="tabDescribe" data-tab="describe" role="tab" aria-selected="false">Describe an idea</button>
+        </div>
+
+        <div class="demo-tab-content" data-tab-content="upload">
+          <div class="frame-mockup" id="frameMockup">
+            <canvas id="previewCanvas" hidden></canvas>
+            <div class="frame-placeholder" id="framePlaceholder">
+              <span>Your photo, reimagined</span>
+            </div>
+          </div>
+          <div class="demo-controls">
+            <label class="btn btn-primary" for="photoInput">Choose a photo</label>
+            <input type="file" id="photoInput" accept="image/*" hidden>
+            <button class="btn btn-ghost" id="regenBtn" disabled>Try another style</button>
+          </div>
+        </div>
+
+        <div class="demo-tab-content" data-tab-content="describe" hidden>
+          <div class="frame-mockup poster-mockup" id="posterMockup">
+            <p id="posterText">Describe what you'd like on your print — a scene, a memory, a feeling.</p>
+          </div>
+          <textarea id="describeInput" rows="3" placeholder="e.g. our dog Biscuit running across a golden beach at sunset, watercolour style"></textarea>
+          <div class="demo-controls">
+            <button class="btn btn-primary" id="describeBtn">Generate preview</button>
+          </div>
+        </div>
+
+        <div class="credits-block">
+          <p class="credits-line" id="creditsLine">1 free preview available</p>
+          <div class="punch-card" id="punchCard" aria-hidden="true"></div>
+          <p class="credits-footnote" id="creditsFootnote">After your free preview, sign up for 4 more changes — or top up 10 further credits for £5, taken off your order if you print.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="gallery" id="gallery">
+    <div class="wrap">
+      <h2>A few we've made</h2>
+      <div class="gallery-grid">
+        <figure class="gallery-item g-rotate-1" style="background-image:url('images/gallery-1.jpg')">
+          <figcaption>A pet portrait, ink wash style</figcaption>
+        </figure>
+        <figure class="gallery-item g-rotate-2" style="background-image:url('images/gallery-2.jpg')">
+          <figcaption>A wedding photo, softened and warm</figcaption>
+        </figure>
+        <figure class="gallery-item g-rotate-3" style="background-image:url('images/gallery-3.jpg')">
+          <figcaption>A family walk, painted in autumn tones</figcaption>
+        </figure>
+        <figure class="gallery-item g-rotate-4" style="background-image:url('images/gallery-4.jpg')">
+          <figcaption>A first home, drawn as a keepsake</figcaption>
+        </figure>
+        <figure class="gallery-item g-rotate-5" style="background-image:url('images/gallery-5.jpg')">
+          <figcaption>A holiday view, described from memory</figcaption>
+        </figure>
+        <figure class="gallery-item g-rotate-6" style="background-image:url('images/gallery-6.jpg')">
+          <figcaption>A newborn's hand, quietly rendered</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing" id="pricing">
+    <div class="wrap">
+      <h2>Sized to fit your wall</h2>
+      <p class="section-sub">Unframed, printed on heavyweight paper. Every print starts with a free preview.</p>
+      <div class="pricing-grid">
+        <div class="price-card price-a4">
+          <div class="price-swatch"></div>
+          <h3>A4</h3>
+          <p class="price-dims">210 × 297mm</p>
+          <p class="price-amount">£25</p>
+          <a href="#try" class="btn btn-ghost">Start this size</a>
+        </div>
+        <div class="price-card price-a3">
+          <div class="price-swatch"></div>
+          <h3>A3</h3>
+          <p class="price-dims">297 × 420mm</p>
+          <p class="price-amount">£45</p>
+          <a href="#try" class="btn btn-ghost">Start this size</a>
+        </div>
+        <div class="price-card price-a2">
+          <div class="price-swatch"></div>
+          <h3>A2</h3>
+          <p class="price-dims">420 × 594mm</p>
+          <p class="price-amount">£80</p>
+          <a href="#try" class="btn btn-ghost">Start this size</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER CTA -->
+  <section class="footer-cta">
+    <div class="wrap">
+      <h2>Got a photo in mind already?</h2>
+      <a href="#try" class="btn btn-primary btn-large">Start your print</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span class="logo logo-small">Fondly</span>
+    <nav class="footer-nav">
+      <a href="#how">How it works</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+    <p class="footer-note">Shipping across the UK only, for now.</p>
+  </div>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>
