@@ -179,7 +179,7 @@ a{ color: var(--berry); }
 }
 .hero-note{ font-size: 0.88rem; color: var(--ink-soft); margin-bottom: 0; }
 
-.hero-visual{ position: relative; min-height: 320px; }
+.hero-visual{ position: relative; aspect-ratio: 1 / 1.05; }
 .frame-stack{
   position: relative;
   width: 100%;
@@ -187,7 +187,7 @@ a{ color: var(--berry); }
 }
 .frame-photo{
   position: absolute;
-  width: 68%;
+  width: 62%;
   aspect-ratio: 4 / 5;
   background-size: cover;
   background-position: center;
@@ -197,16 +197,16 @@ a{ color: var(--berry); }
   border-radius: 2px;
 }
 .frame-back{
-  top: 0;
-  left: 0;
+  top: 4%;
+  left: 2%;
   transform: rotate(-6deg);
   background-image:
     linear-gradient(155deg, rgba(122,46,59,0.16), rgba(201,138,44,0.22)),
     var(--frame-fallback, none);
 }
 .frame-front{
-  bottom: 0;
-  right: 0;
+  bottom: 4%;
+  right: 2%;
   transform: rotate(4deg);
   background-image:
     linear-gradient(155deg, rgba(43,27,20,0.14), rgba(201,138,44,0.28)),
@@ -538,7 +538,7 @@ a{ color: var(--berry); }
   .nav-toggle{ display: flex; }
 
   .hero-inner{ grid-template-columns: 1fr; }
-  .hero-visual{ min-height: 260px; order: -1; }
+  .hero-visual{ aspect-ratio: 1 / 0.85; order: -1; }
 
   .try-inner{ grid-template-columns: 1fr; }
 
