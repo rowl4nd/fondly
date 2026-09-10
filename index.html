@@ -57,24 +57,30 @@
   <!-- HOW IT WORKS -->
   <section class="how" id="how">
     <div class="wrap">
-      <h2>From photo to print, in three steps</h2>
+      <h2>From photo to print, in four steps</h2>
       <ol class="strip">
         <li>
           <span class="stub">1</span>
-          <h3>Upload a photo, or tell us what you're picturing</h3>
-          <p>A favourite snap, a pet, a place you love — or just a few sentences describing the idea.</p>
+          <h3>Upload a photo, and/or describe your idea</h3>
+          <p>A favourite snap, a pet, a place you love — with a few words about anything you'd like changed, or a description on its own.</p>
         </li>
         <li>
           <span class="stub">2</span>
-          <h3>We shape it into your style, free to preview</h3>
-          <p>See your design before you pay a penny. Not quite right? Nudge it again within your set of changes.</p>
+          <h3>Choose a style</h3>
+          <p>Ink wash, watercolour, line art or oil paint — pick the treatment that suits it.</p>
         </li>
         <li>
           <span class="stub">3</span>
-          <h3>Happy with it? We print it and post it out</h3>
-          <p>Printed at true gallery quality on heavyweight paper, and on its way to you within days.</p>
+          <h3>Pick your colour palette</h3>
+          <p>Warm, muted, or bold — whatever fits the wall it's going on.</p>
+        </li>
+        <li>
+          <span class="stub">4</span>
+          <h3>Add text, if you'd like</h3>
+          <p>A name, a date, a few words — printed right onto the piece.</p>
         </li>
       </ol>
+      <p class="how-note">All four are included in your free preview. Want to keep tweaking after that? Sign up for more changes, or top up credits — either way, it comes off your final print.</p>
     </div>
   </section>
 
@@ -83,50 +89,78 @@
     <div class="wrap try-inner">
       <div class="try-copy">
         <h2>Try the idea yourself</h2>
-        <p>This is a working preview of the design tool — upload a photo below and watch it shift into print-ready style, right in your browser.</p>
+        <p>This is a working preview of the design tool. Work through the four steps below — moving between them is free, it's generating the preview that uses a credit.</p>
         <div class="trust-list">
-          <p>Free to preview before you pay</p>
+          <p>Free to configure before you generate</p>
           <p>Printed at home, on real print stock</p>
           <p>Only pay when you're happy with the design</p>
         </div>
       </div>
 
       <div class="demo-panel">
-        <div class="demo-tabs" role="tablist">
-          <button class="tab-btn active" id="tabUpload" data-tab="upload" role="tab" aria-selected="true">Upload a photo</button>
-          <button class="tab-btn" id="tabDescribe" data-tab="describe" role="tab" aria-selected="false">Describe an idea</button>
+        <div class="stepper" id="stepper">
+          <button class="step-dot active" data-step="1" type="button"><span class="step-num">1</span><span class="step-label">Photo / idea</span></button>
+          <button class="step-dot" data-step="2" type="button"><span class="step-num">2</span><span class="step-label">Style</span></button>
+          <button class="step-dot" data-step="3" type="button"><span class="step-num">3</span><span class="step-label">Colour</span></button>
+          <button class="step-dot" data-step="4" type="button"><span class="step-num">4</span><span class="step-label">Text</span></button>
         </div>
 
-        <div class="demo-tab-content" data-tab-content="upload">
-          <div class="frame-mockup" id="frameMockup">
-            <canvas id="previewCanvas" hidden></canvas>
-            <div class="frame-placeholder" id="framePlaceholder">
-              <span>Your photo, reimagined</span>
+        <div class="frame-mockup" id="frameMockup">
+          <canvas id="previewCanvas" hidden></canvas>
+          <div class="poster-preview" id="posterPreview" hidden>
+            <p id="posterText"></p>
+            <p class="poster-caption" id="posterCaption" hidden></p>
+          </div>
+          <div class="frame-placeholder" id="framePlaceholder">
+            <span>Your photo, reimagined</span>
+          </div>
+        </div>
+
+        <div class="step-panels">
+          <div class="step-panel" data-step-panel="1">
+            <label class="style-label" for="photoInput">Add a photo <span class="optional">(optional if you're describing an idea)</span></label>
+            <div class="demo-controls file-row">
+              <label class="btn btn-primary" for="photoInput">Choose a photo</label>
+              <input type="file" id="photoInput" accept="image/*" hidden>
+              <span class="file-chosen" id="fileChosen"></span>
+            </div>
+            <label class="style-label" for="describeInput">Describe your idea, or any changes <span class="optional">(optional if you've added a photo)</span></label>
+            <textarea id="describeInput" rows="2" placeholder="e.g. dressed in a king's crown, sitting on a throne"></textarea>
+          </div>
+
+          <div class="step-panel" data-step-panel="2" hidden>
+            <p class="step-intro">Pick the treatment.</p>
+            <div class="choice-row" id="styleChoices">
+              <button class="choice-btn active" data-style="ink" type="button">Ink Wash</button>
+              <button class="choice-btn" data-style="watercolour" type="button">Watercolour</button>
+              <button class="choice-btn" data-style="line" type="button">Line Art</button>
+              <button class="choice-btn" data-style="oil" type="button">Oil Paint</button>
             </div>
           </div>
-          <p class="style-caption" id="styleCaption" hidden></p>
-          <div class="style-input-wrap">
-            <label for="styleInput" class="style-label">Add styling directions <span class="optional">(optional)</span></label>
-            <textarea id="styleInput" rows="2" placeholder="e.g. dressed in a king's crown, sitting on a throne"></textarea>
+
+          <div class="step-panel" data-step-panel="3" hidden>
+            <p class="step-intro">Pick your colours.</p>
+            <div class="choice-row" id="colourChoices">
+              <button class="swatch-btn active" data-colour="mono" type="button" style="--sw-dark:#2B1B14;--sw-light:#F3E9D8;">Mono Ink</button>
+              <button class="swatch-btn" data-colour="berry" type="button" style="--sw-dark:#5E212B;--sw-light:#F3E9D8;">Warm Berry</button>
+              <button class="swatch-btn" data-colour="gold" type="button" style="--sw-dark:#2B1B14;--sw-light:#C98A2C;">Golden Hour</button>
+              <button class="swatch-btn" data-colour="plum" type="button" style="--sw-dark:#4A1942;--sw-light:#E9DCC3;">Plum Dusk</button>
+            </div>
           </div>
-          <div class="demo-controls">
-            <label class="btn btn-primary" for="photoInput">Choose a photo</label>
-            <input type="file" id="photoInput" accept="image/*" hidden>
-            <button class="btn btn-ghost" id="regenBtn" disabled>Try another style</button>
+
+          <div class="step-panel" data-step-panel="4" hidden>
+            <label class="style-label" for="printTextInput">Add text to the print <span class="optional">(optional)</span></label>
+            <textarea id="printTextInput" rows="1" placeholder="e.g. Biscuit, Est. 2021"></textarea>
           </div>
         </div>
 
-        <div class="demo-tab-content" data-tab-content="describe" hidden>
-          <div class="frame-mockup poster-mockup" id="posterMockup">
-            <p id="posterText">Describe what you'd like on your print — a scene, a memory, a feeling.</p>
-          </div>
-          <textarea id="describeInput" rows="3" placeholder="e.g. our dog Biscuit running across a golden beach at sunset, watercolour style"></textarea>
-          <div class="demo-controls">
-            <button class="btn btn-primary" id="describeBtn">Generate preview</button>
-          </div>
+        <div class="step-nav">
+          <button class="btn btn-ghost" id="stepBack" type="button" disabled>Back</button>
+          <button class="btn btn-primary" id="stepNext" type="button">Next: style</button>
         </div>
 
         <div class="credits-block">
+          <p class="credits-hint">Steps 1–4 are free to configure and reconfigure — it's generating or updating the preview that counts as a change.</p>
           <p class="credits-line" id="creditsLine">1 free preview available</p>
           <div class="punch-card" id="punchCard" aria-hidden="true"></div>
           <p class="credits-footnote" id="creditsFootnote">After your free preview, sign up for 4 more changes — or top up 10 further credits for £5, taken off your order if you print.</p>
