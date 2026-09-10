@@ -118,6 +118,8 @@
   var photoInput = document.getElementById("photoInput");
   var canvas = document.getElementById("previewCanvas");
   var placeholder = document.getElementById("framePlaceholder");
+  var styleInput = document.getElementById("styleInput");
+  var styleCaption = document.getElementById("styleCaption");
   var ctx = canvas.getContext("2d");
 
   function applyDuotone(img, palette) {
@@ -153,6 +155,15 @@
     canvas.hidden = false;
     placeholder.hidden = true;
     regenBtn.disabled = false;
+
+    var direction = styleInput.value.trim();
+    if (direction) {
+      styleCaption.textContent = "Styled as: \u201C" + direction + "\u201D";
+      styleCaption.hidden = false;
+    } else {
+      styleCaption.hidden = true;
+      styleCaption.textContent = "";
+    }
   }
 
   photoInput.addEventListener("change", function (e) {
