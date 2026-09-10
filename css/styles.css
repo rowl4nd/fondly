@@ -354,6 +354,40 @@ a{ color: var(--berry); }
   margin: 0;
 }
 
+.style-caption{
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  text-align: center;
+  margin: -0.6rem 0 1.1rem;
+  padding: 0.5em 0.9em;
+  background: var(--paper-deep);
+  border-radius: 3px;
+}
+
+.style-input-wrap{ margin-bottom: 1.1rem; }
+.style-label{
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.4rem;
+}
+.style-label .optional{ font-weight: 400; color: var(--ink-soft); }
+#styleInput{
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  padding: 0.7em;
+  resize: vertical;
+}
+#styleInput:focus-visible{ outline: 2px solid var(--mustard); outline-offset: 1px; }
+
 .demo-controls{ display: flex; gap: 0.8rem; flex-wrap: wrap; }
 
 #describeInput{
