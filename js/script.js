@@ -36,9 +36,8 @@
   var canvas = document.getElementById("previewCanvas");
   var ctx = canvas.getContext("2d");
   var placeholder = document.getElementById("framePlaceholder");
-  var posterPreview = document.getElementById("posterPreview");
-  var posterText = document.getElementById("posterText");
-  var posterCaption = document.getElementById("posterCaption");
+  var frameLoading = document.getElementById("frameLoading");
+  var generationError = document.getElementById("generationError");
 
   var styleChoices = document.getElementById("styleChoices");
   var colourChoices = document.getElementById("colourChoices");
@@ -46,6 +45,7 @@
 
   var resultStage = document.getElementById("resultStage");
   var promptText = document.getElementById("promptText");
+  var promptTextNote = document.getElementById("promptTextNote");
   var finalAdjustInput = document.getElementById("finalAdjustInput");
   var finalAdjustBtn = document.getElementById("finalAdjustBtn");
   var startAgainBtn = document.getElementById("startAgainBtn");
@@ -64,10 +64,12 @@
   var NEXT_LABELS = { 1: "Next: style", 2: "Next: colour", 3: "Next: text" };
 
   var currentImage = null;
+  var currentImageDataUrl = null;
   var selectedStyle = "ink";
   var selectedColour = "mono";
   var selectedPosition = "bottom";
   var hasGenerated = false;
+  var isGenerating = false;
 
   function goToStep(n) {
     currentStep = Math.min(Math.max(n, 1), TOTAL_STEPS);
@@ -125,6 +127,7 @@
   });
 
   stepNext.addEventListener("click", function () {
+    if (isGenerating) return;
     if (currentStep === 1) {
       if (!currentImage && !describeInput.value.trim()) {
         describeInput.focus();
@@ -143,10 +146,7 @@
         showConsentError();
         return;
       }
-      consumeCredit(function () {
-        generatePreview();
-        showResultStage();
-      });
+      runGeneration({ isFirstRun: true });
     }
   });
 
@@ -306,11 +306,11 @@
     renderPunchCard();
   }
 
-  function consumeCredit(onGenerate) {
-    if (state.phase === "exhausted") {
-      creditsLine.textContent = "Top up 10 credits for £5 to keep going";
-      return false;
-    }
+  function canUseCredit() {
+    return state.phase !== "exhausted";
+  }
+
+  function commitCreditUse() {
     if (state.used >= state.total) {
       if (state.phase === "free") {
         state.phase = "signedup";
@@ -324,7 +324,6 @@
     }
     state.used += 1;
     renderCreditsCopy();
-    onGenerate();
     return true;
   }
 
@@ -344,89 +343,124 @@
     ctx.fillText(text, w / 2, y + plaqueH / 2, w - 24);
   }
 
-  function drawGrain(w, h) {
-    var dots = Math.round((w * h) / 900);
-    ctx.save();
-    for (var i = 0; i < dots; i++) {
-      ctx.globalAlpha = Math.random() * 0.06;
-      ctx.fillStyle = Math.random() > 0.5 ? "#FFFFFF" : "#000000";
-      ctx.fillRect(Math.random() * w, Math.random() * h, 1.4, 1.4);
-    }
-    ctx.restore();
+  // Downscale the uploaded photo before it goes over the wire — keeps the
+  // request small/fast and well under Vercel's request body limit. The AI
+  // model doesn't need more than this to work with.
+  function resizedImageDataUrl(img, maxDim) {
+    var w = img.naturalWidth || img.width;
+    var h = img.naturalHeight || img.height;
+    var scale = Math.min(maxDim / Math.max(w, h), 1);
+    var rw = Math.max(1, Math.round(w * scale));
+    var rh = Math.max(1, Math.round(h * scale));
+    var off = document.createElement("canvas");
+    off.width = rw;
+    off.height = rh;
+    off.getContext("2d").drawImage(img, 0, 0, rw, rh);
+    return off.toDataURL("image/jpeg", 0.85);
   }
 
-  function applyStyledDuotone(img, styleKey, colourKey, printText, position) {
+  // What's actually sent to the AI — subject + style + colour only. Print
+  // text is deliberately excluded and drawn on separately (see
+  // drawTextPlaque) rather than trusted to the model's own text rendering.
+  function buildPrompt() {
+    var desc = describeInput.value.trim();
+    var subjectPart = currentImage ? "This photo" + (desc ? ", " + desc : "") : (desc || "Your idea");
+    var stylePart = "an " + STYLE_LABELS[selectedStyle] + " style";
+    var colourPart = "a " + COLOUR_LABELS[selectedColour] + " colour palette";
+    return subjectPart + " — rendered in " + stylePart + ", " + colourPart + ".";
+  }
+
+  async function callGenerateAPI(prompt, imageDataUrl) {
+    var res = await fetch("/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: prompt, imageDataUrl: imageDataUrl || undefined })
+    });
+    var data = await res.json().catch(function () { return {}; });
+    if (!res.ok || !data.imageUrl) {
+      throw new Error((data && data.error) || "The design AI didn't return an image.");
+    }
+    return data.imageUrl;
+  }
+
+  function loadImage(url) {
+    return new Promise(function (resolve, reject) {
+      var img = new Image();
+      img.onload = function () { resolve(img); };
+      img.onerror = function () { reject(new Error("The generated image couldn't be loaded.")); };
+      img.src = url;
+    });
+  }
+
+  function drawResultToCanvas(img, printText, position) {
     var maxW = 480, maxH = 340;
     var w = img.naturalWidth || img.width;
     var h = img.naturalHeight || img.height;
     var scale = Math.min(maxW / w, maxH / h, 1);
     canvas.width = Math.max(1, Math.round(w * scale));
     canvas.height = Math.max(1, Math.round(h * scale));
-
-    ctx.filter = canvasFilterFor(styleKey);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    ctx.filter = "none";
+    drawTextPlaque(canvas.width, canvas.height, printText, position);
+    canvas.hidden = false;
+    placeholder.hidden = true;
+  }
 
-    var frame;
-    try {
-      frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    } catch (e) {
+  function setGenerating(on) {
+    isGenerating = on;
+    frameLoading.hidden = !on;
+    stepNext.disabled = on;
+    stepBack.disabled = on || currentStep === 1;
+    finalAdjustBtn.disabled = on;
+    stepDots.forEach(function (dot) { dot.disabled = on; });
+  }
+
+  function showGenerationError(message) {
+    generationError.textContent = message + " This attempt hasn't used a credit — try again.";
+    generationError.hidden = false;
+  }
+
+  function hideGenerationError() {
+    generationError.hidden = true;
+  }
+
+  async function runGeneration(opts) {
+    if (!canUseCredit()) {
+      creditsLine.textContent = "Top up 10 credits for £5 to keep going";
       return;
     }
-    ctx.putImageData(duotoneImageData(frame, styleKey, colourKey), 0, 0);
-
-    if (styleKey === "oil") drawGrain(canvas.width, canvas.height);
-    drawTextPlaque(canvas.width, canvas.height, printText, position);
+    hideGenerationError();
+    setGenerating(true);
+    var prompt = buildPrompt();
+    var imageDataUrl = currentImage ? resizedImageDataUrl(currentImage, 1024) : null;
+    try {
+      var resultUrl = await callGenerateAPI(prompt, imageDataUrl);
+      var img = await loadImage(resultUrl);
+      commitCreditUse();
+      drawResultToCanvas(img, printTextInput.value.trim(), selectedPosition);
+      hasGenerated = true;
+      if (opts && opts.isFirstRun) {
+        showResultStage();
+      } else {
+        promptText.textContent = prompt;
+        updatePromptNote();
+        finalAdjustInput.value = "";
+      }
+    } catch (err) {
+      showGenerationError(err.message || "Something went wrong generating your print.");
+    } finally {
+      setGenerating(false);
+    }
   }
 
-  function renderPosterPreview() {
-    var desc = describeInput.value.trim();
-    var pair = COLOUR_PAIRS[selectedColour] || COLOUR_PAIRS.mono;
-    posterPreview.style.background =
-      "linear-gradient(155deg, rgba(" + pair.dark.join(",") + ",0.16), rgba(" +
-      pair.light.join(",") + ",0.32)), var(--paper-deep)";
-    posterText.textContent = "\u201C" + desc + "\u201D";
+  function updatePromptNote() {
     var printText = printTextInput.value.trim();
     if (printText && selectedPosition !== "none") {
-      posterCaption.textContent = printText;
-      posterCaption.hidden = false;
+      promptTextNote.textContent =
+        '+ text overlay: "' + printText + '" (' + selectedPosition + ") — added after generating, not sent to the AI";
+      promptTextNote.hidden = false;
     } else {
-      posterCaption.hidden = true;
+      promptTextNote.hidden = true;
     }
-  }
-
-  function generatePreview() {
-    var printText = printTextInput.value.trim();
-    if (currentImage) {
-      applyStyledDuotone(currentImage, selectedStyle, selectedColour, printText, selectedPosition);
-      canvas.hidden = false;
-      posterPreview.hidden = true;
-      placeholder.hidden = true;
-    } else if (describeInput.value.trim()) {
-      renderPosterPreview();
-      posterPreview.hidden = false;
-      canvas.hidden = true;
-      placeholder.hidden = true;
-    } else {
-      canvas.hidden = true;
-      posterPreview.hidden = true;
-      placeholder.hidden = false;
-    }
-    hasGenerated = true;
-  }
-
-  /* ---------- Prompt built from the four steps ---------- */
-  function buildPrompt() {
-    var desc = describeInput.value.trim();
-    var subjectPart = currentImage ? "Your uploaded photo" + (desc ? ", " + desc : "") : (desc || "Your idea");
-    var stylePart = "an " + STYLE_LABELS[selectedStyle] + " style";
-    var colourPart = "a " + COLOUR_LABELS[selectedColour] + " colour palette";
-    var printText = printTextInput.value.trim();
-    var textPart =
-      printText && selectedPosition !== "none"
-        ? ', with the text "' + printText + '" placed at the ' + selectedPosition + " of the print"
-        : "";
-    return subjectPart + " — rendered in " + stylePart + ", " + colourPart + textPart + ".";
   }
 
   /* ---------- Result stage ---------- */
@@ -436,6 +470,7 @@
     stepNavRow.hidden = true;
     resultStage.hidden = false;
     promptText.textContent = buildPrompt();
+    updatePromptNote();
     finalAdjustInput.value = "";
   }
 
@@ -447,18 +482,16 @@
   }
 
   finalAdjustBtn.addEventListener("click", function () {
+    if (isGenerating) return;
     var tweak = finalAdjustInput.value.trim();
     if (!tweak) return;
     describeInput.value = describeInput.value.trim() ? describeInput.value.trim() + ". " + tweak : tweak;
-    consumeCredit(function () {
-      generatePreview();
-      promptText.textContent = buildPrompt();
-      finalAdjustInput.value = "";
-    });
+    runGeneration({ isFirstRun: false });
   });
 
   startAgainBtn.addEventListener("click", function () {
     currentImage = null;
+    currentImageDataUrl = null;
     photoInput.value = "";
     fileChosen.textContent = "";
     describeInput.value = "";
@@ -466,6 +499,7 @@
     finalAdjustInput.value = "";
     consentCheckbox.checked = false;
     hideConsentError();
+    hideGenerationError();
 
     selectedStyle = "ink";
     selectedColour = "mono";
@@ -483,7 +517,6 @@
     });
 
     canvas.hidden = true;
-    posterPreview.hidden = true;
     placeholder.hidden = false;
 
     renderStyleThumbnails();
@@ -499,6 +532,7 @@
     fileChosen.textContent = file.name;
     var reader = new FileReader();
     reader.onload = function (ev) {
+      currentImageDataUrl = ev.target.result;
       var img = new Image();
       img.onload = function () {
         currentImage = img;
