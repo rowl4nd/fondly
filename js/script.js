@@ -30,6 +30,8 @@
   var fileChosen = document.getElementById("fileChosen");
   var describeInput = document.getElementById("describeInput");
   var printTextInput = document.getElementById("printTextInput");
+  var consentCheckbox = document.getElementById("consentCheckbox");
+  var consentError = document.getElementById("consentError");
 
   var canvas = document.getElementById("previewCanvas");
   var ctx = canvas.getContext("2d");
@@ -82,9 +84,39 @@
         : NEXT_LABELS[currentStep];
   }
 
+  function hasConsent() {
+    return consentCheckbox.checked;
+  }
+
+  function showConsentError() {
+    consentError.hidden = false;
+    consentCheckbox.focus();
+  }
+
+  function hideConsentError() {
+    consentError.hidden = true;
+  }
+
+  consentCheckbox.addEventListener("change", function () {
+    if (consentCheckbox.checked) hideConsentError();
+  });
+
   stepDots.forEach(function (dot) {
     dot.addEventListener("click", function () {
-      goToStep(Number(dot.getAttribute("data-step")));
+      var target = Number(dot.getAttribute("data-step"));
+      if (target > 1) {
+        if (!currentImage && !describeInput.value.trim()) {
+          goToStep(1);
+          describeInput.focus();
+          return;
+        }
+        if (!hasConsent()) {
+          goToStep(1);
+          showConsentError();
+          return;
+        }
+      }
+      goToStep(target);
     });
   });
 
@@ -93,13 +125,24 @@
   });
 
   stepNext.addEventListener("click", function () {
-    if (currentStep === 1 && !currentImage && !describeInput.value.trim()) {
-      describeInput.focus();
-      return;
+    if (currentStep === 1) {
+      if (!currentImage && !describeInput.value.trim()) {
+        describeInput.focus();
+        return;
+      }
+      if (!hasConsent()) {
+        showConsentError();
+        return;
+      }
     }
     if (currentStep < TOTAL_STEPS) {
       goToStep(currentStep + 1);
     } else {
+      if (!hasConsent()) {
+        goToStep(1);
+        showConsentError();
+        return;
+      }
       consumeCredit(function () {
         generatePreview();
         showResultStage();
@@ -421,6 +464,8 @@
     describeInput.value = "";
     printTextInput.value = "";
     finalAdjustInput.value = "";
+    consentCheckbox.checked = false;
+    hideConsentError();
 
     selectedStyle = "ink";
     selectedColour = "mono";
