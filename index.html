@@ -126,6 +126,14 @@
             </div>
             <label class="style-label" for="describeInput">Describe your idea, or any changes <span class="optional">(optional if you've added a photo)</span></label>
             <textarea id="describeInput" rows="2" placeholder="e.g. dressed in a king's crown, sitting on a throne"></textarea>
+
+            <div class="consent-row">
+              <label class="consent-label">
+                <input type="checkbox" id="consentCheckbox">
+                <span>I confirm any photo I upload is mine to use, or I have permission from whoever it belongs to, and I agree to the <a href="terms.html" target="_blank" rel="noopener">Terms &amp; Conditions</a>, including what's not allowed to be printed.</span>
+              </label>
+              <p class="consent-error" id="consentError" hidden>Please confirm the above before continuing.</p>
+            </div>
           </div>
 
           <div class="step-panel" data-step-panel="2" hidden>
@@ -291,6 +299,7 @@
       <a href="#how">How it works</a>
       <a href="#gallery">Gallery</a>
       <a href="#pricing">Pricing</a>
+      <a href="terms.html">Terms &amp; Conditions</a>
     </nav>
     <p class="footer-note">Shipping across the UK only, for now.</p>
   </div>
