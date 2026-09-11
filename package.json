@@ -1,0 +1,6 @@
+{
+  "name": "fondly",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Fondly — personalised AI print site, with a /api/generate serverless function calling fal.ai."
+}
