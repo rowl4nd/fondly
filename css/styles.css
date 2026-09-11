@@ -402,6 +402,29 @@ a{ color: var(--berry); }
 }
 .style-label .optional{ font-weight: 400; color: var(--ink-soft); }
 
+.consent-row{ margin-top: 1rem; }
+.consent-label{
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  cursor: pointer;
+}
+.consent-label input[type="checkbox"]{
+  margin-top: 0.2em;
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: var(--berry);
+  flex-shrink: 0;
+}
+.consent-label span{ font-size: 0.85rem; color: var(--ink-soft); line-height: 1.5; }
+.consent-label a{ color: var(--ink); text-decoration: underline; }
+.consent-error{
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--berry);
+  font-weight: 600;
+}
+
 .demo-controls{ display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; }
 .file-row{ margin-bottom: 1.1rem; }
 .file-chosen{ font-size: 0.85rem; color: var(--ink-soft); }
@@ -512,6 +535,23 @@ a{ color: var(--berry); }
 }
 .punch.used{ background: var(--berry); }
 .credits-footnote{ font-size: 0.85rem; margin-bottom: 0; }
+
+/* ---------------------------------------------
+   Legal / terms page
+--------------------------------------------- */
+.legal{ padding: 3.5rem 0 5rem; }
+.legal-content{ max-width: 68ch; }
+.legal-content h1{ margin-bottom: 0.4em; }
+.legal-content h2{
+  font-size: 1.25rem;
+  margin-top: 2.2rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--hairline);
+}
+.legal-content h2:first-of-type{ border-top: none; padding-top: 0; }
+.legal-updated{ font-size: 0.88rem; color: var(--ink-soft); margin-bottom: 2rem; }
+.legal-content ul{ margin: 0 0 1em; padding-left: 1.3em; color: var(--ink-soft); }
+.legal-content li{ margin-bottom: 0.5em; max-width: 62ch; }
 
 /* ---------------------------------------------
    Gallery
