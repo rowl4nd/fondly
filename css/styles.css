@@ -325,6 +325,7 @@ a{ color: var(--berry); }
 }
 .step-dot.active{ border-bottom-color: var(--berry); }
 .step-dot:focus-visible{ outline: 2px solid var(--mustard); outline-offset: 2px; }
+.step-dot:disabled{ opacity: 0.5; cursor: not-allowed; }
 .step-num{
   display: inline-flex;
   align-items: center;
@@ -367,31 +368,41 @@ a{ color: var(--berry); }
 }
 #previewCanvas{ max-width: 100%; max-height: 380px; display: block; }
 
-.poster-preview{
-  width: 100%;
-  padding: 2rem;
-  text-align: center;
-}
-#posterText{
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-style: italic;
-  text-align: center;
-  color: var(--ink);
-  max-width: 32ch;
-  margin: 0 auto;
-}
-.poster-caption{
-  margin: 0.9rem auto 0;
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 0.85rem;
+.frame-loading{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
   color: var(--ink-soft);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1rem;
+}
+.spinner{
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 2.5px solid var(--hairline);
+  border-top-color: var(--berry);
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin{ to{ transform: rotate(360deg); } }
+
+.generation-error{
+  margin: -0.6rem 0 1.1rem;
+  padding: 0.7em 0.9em;
+  background: var(--paper-deep);
+  border: 1px solid var(--berry);
+  border-radius: 4px;
+  color: var(--berry);
+  font-size: 0.88rem;
+  font-weight: 600;
 }
 
 /* Step panels */
 .step-panel{ margin-bottom: 1.1rem; }
 .step-intro{ font-weight: 600; color: var(--ink); margin-bottom: 0.8rem; }
+.step-note{ font-size: 0.82rem; color: var(--ink-soft); margin: 0.8rem 0 0; }
 
 .style-label{
   display: block;
@@ -504,6 +515,7 @@ a{ color: var(--berry); }
 }
 .prompt-label{ font-size: 0.78rem; font-weight: 700; color: var(--ink-soft); margin-bottom: 0.35rem; }
 .prompt-text{ font-family: var(--font-display); font-style: italic; font-size: 0.98rem; color: var(--ink); margin: 0; }
+.prompt-text-note{ font-size: 0.8rem; color: var(--ink-soft); margin: 0.5rem 0 0; }
 
 .adjust-row{ display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 1.3rem; }
 .adjust-row textarea{
