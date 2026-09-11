@@ -107,14 +107,15 @@
 
         <div class="frame-mockup" id="frameMockup">
           <canvas id="previewCanvas" hidden></canvas>
-          <div class="poster-preview" id="posterPreview" hidden>
-            <p id="posterText"></p>
-            <p class="poster-caption" id="posterCaption" hidden></p>
+          <div class="frame-loading" id="frameLoading" hidden>
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Generating your print&hellip;</span>
           </div>
           <div class="frame-placeholder" id="framePlaceholder">
             <span>Your photo, reimagined</span>
           </div>
         </div>
+        <p class="generation-error" id="generationError" hidden></p>
 
         <div class="step-panels">
           <div class="step-panel" data-step-panel="1">
@@ -190,6 +191,7 @@
               <button class="pos-btn active" data-position="bottom" type="button">Bottom</button>
               <button class="pos-btn" data-position="none" type="button">None</button>
             </div>
+            <p class="step-note">Printed directly onto the piece once it's generated — not sent to the AI.</p>
           </div>
         </div>
 
@@ -202,6 +204,7 @@
           <div class="prompt-box">
             <p class="prompt-label">Prompt sent to our design AI</p>
             <p class="prompt-text" id="promptText"></p>
+            <p class="prompt-text-note" id="promptTextNote" hidden></p>
           </div>
           <div class="adjust-row">
             <label class="style-label" for="finalAdjustInput">One last descriptive adjustment <span class="optional">(optional)</span></label>
