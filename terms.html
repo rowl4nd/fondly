@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms &amp; Conditions — Fondly</title>
+<meta name="description" content="Fondly's terms and conditions, covering image rights and consent, and what we won't print.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a href="index.html" class="logo">Fondly</a>
+    <nav class="main-nav" id="mainNav">
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#gallery">Gallery</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="index.html#try" class="nav-cta">Start a print</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="legal">
+    <div class="wrap legal-content">
+      <h1>Terms &amp; Conditions</h1>
+      <p class="legal-updated">Last updated: [add date before launch] — placeholder copy, have this checked by a solicitor before it goes live.</p>
+
+      <h2>1. About these terms</h2>
+      <p>These terms govern your use of the Fondly website and the design and printing service we offer. By uploading a photo, describing an idea, generating a preview, or placing an order, you agree to them.</p>
+
+      <h2>2. Your photos and your idea</h2>
+      <p>When you upload a photo, you confirm that:</p>
+      <ul>
+        <li>you took it yourself, or you own the rights to it, or you have the express permission of whoever does;</li>
+        <li>if the photo shows another identifiable person, you have their permission — or, if they're a child, the permission of a parent or guardian — to use it this way;</li>
+        <li>you're not uploading anything that belongs to someone else without their consent, including images found online, screenshots, or other people's artwork.</li>
+      </ul>
+      <p>We rely on your confirmation and don't independently verify ownership. If someone contacts us with a genuine rights or consent complaint about an image you've uploaded, we may remove the design, cancel any related order, and share the details we hold with the rights holder or the relevant authority where we're legally required to.</p>
+
+      <h2>3. What we won't print</h2>
+      <p>We reserve the right to refuse, cancel, or remove any design or order that:</p>
+      <ul>
+        <li>is illegal, or would require us to break the law to produce;</li>
+        <li>is sexually explicit, or sexualises a minor in any way;</li>
+        <li>promotes violence, self-harm, hatred, or discrimination against any person or group;</li>
+        <li>defames, harasses, or impersonates a real person without their consent;</li>
+        <li>infringes someone else's copyright, trademark, or other intellectual property — including using a brand, character, or celebrity likeness without permission;</li>
+        <li>we otherwise reasonably consider unethical, offensive, or likely to cause harm.</li>
+      </ul>
+      <p>This applies whether the content comes from your uploaded photo, your written description, or the design we generate from them. Where we cancel an order for one of these reasons, we may withhold or refund payment at our discretion, and, in serious cases, may report the matter to the relevant authorities.</p>
+
+      <h2>4. Previews, credits and payment</h2>
+      <p>Design previews are generated using AI and are approximations — the finished print may vary slightly from the on-screen preview. Free previews and change credits are described on the site at the time you use them; unused credits have no cash value and aren't transferable. You only pay once you choose a size and confirm your order.</p>
+
+      <h2>5. Intellectual property</h2>
+      <p>You keep ownership of any photo you upload. We own the software, templates, and design tool used to create your preview. The finished design we generate for you is yours to keep and print for personal use once you've paid for it; it isn't for resale as a product in its own right.</p>
+
+      <h2>6. Our liability</h2>
+      <p>The design tool and previews are provided "as is." We aren't liable for losses arising from your use of an image or description you didn't have the rights to, or from a design that breaches section 3 that we didn't catch before printing. Nothing in these terms limits our liability where the law doesn't allow us to.</p>
+
+      <h2>7. Changes to these terms</h2>
+      <p>We may update these terms from time to time; the current version will always be on this page.</p>
+
+      <h2>8. Contact</h2>
+      <p>Questions about these terms? Get in touch at <a href="mailto:hello@example.com">hello@example.com</a> — replace with your real address before launch.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span class="logo logo-small">Fondly</span>
+    <nav class="footer-nav">
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#gallery">Gallery</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="terms.html">Terms &amp; Conditions</a>
+    </nav>
+    <p class="footer-note">Shipping across the UK only, for now.</p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var navToggle = document.getElementById("navToggle");
+    var mainNav = document.getElementById("mainNav");
+    if (navToggle && mainNav) {
+      navToggle.addEventListener("click", function () {
+        var isOpen = mainNav.classList.toggle("open");
+        navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      });
+    }
+  })();
+</script>
+</body>
+</html>
